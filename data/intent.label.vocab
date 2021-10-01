@@ -1,6 +1,6 @@
 <PAD>	0
-weather.dust	1
-weather.general	2
+weather.general	1
+weather.dust	2
 weather.humidity	3
 weather.maxtemperature	4
 weather.mintemperature	5

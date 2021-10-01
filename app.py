@@ -69,7 +69,7 @@ def main():
         intent_option = st.selectbox('Select a intent', intent_label_vocab)
         st.write('Selected intent : ', intent_option)
     with row13_2:
-        slot_option = st.text_area("Enter the slot tags and values", "")
+        slot_option = st.text_area("Enter the slot tags and values", "day.p=*,location=*")
         _slot_option = ''
         if '*' in slot_option:
             _slot_option = slot_option.replace('*', '\*')
