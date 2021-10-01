@@ -111,7 +111,7 @@ def load_vocab(fn):
             symbol, _id = line.split('\t')
             vocab.append(symbol)
 
-    vocab.sort()
+    #vocab.sort()
     return vocab[1:]
 
 def load_slot_value_vocab(fn):
