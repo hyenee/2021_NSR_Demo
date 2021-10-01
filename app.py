@@ -85,7 +85,7 @@ def main():
             # Calling the forward method on click of Generate
             with st.spinner('Progress your text .... '):
                 df = pd.read_csv(os.path.join('./data', model_name, "reranking_100.csv"), delimiter='\t')
-                is_exist = df['sf_sents'] == semantic_control_grammar
+                is_exist = df['query'] == semantic_control_grammar
                 filtered = df[is_exist]
                 filtered.rename(columns = {'generated_texts' : '생성 문장'}, inplace = True)
                 filtered.reset_index(inplace = True) 
