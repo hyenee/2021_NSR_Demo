@@ -91,8 +91,8 @@ def main():
                 filtered.reset_index(inplace = True) 
                 filtered = filtered[:num_return_sequences]    
 
-                html_table = filtered[['생성 문장', 'train_data']].to_html(col_space='100px', justify='center') 
-                st.table(data=filtered[['생성 문장', 'train_data']])
+                html_table = filtered[['생성 문장', 'train_texts']].to_html(col_space='100px', justify='center') 
+                st.table(data=filtered[['생성 문장', 'train_texts']])
 
 
 
