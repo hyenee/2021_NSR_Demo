@@ -18,12 +18,11 @@ def main():
                     } </style>""", unsafe_allow_html=True)
 
     # Select Box for the model
-    st.sidebar.image('./fig/logo.png', use_column_width=True)
+    st.sidebar.image('./fig/logo.png', use_column_width='never')
     model_name = st.sidebar.selectbox("Model", ("t5", "bart", "gpt2"))
-    dataset = st.sidebar.selectbox("Dataset", ("Weather",""))  
+    dataset = st.sidebar.selectbox("Dataset", ("Weather"))  
     num_return_sequences = st.sidebar.slider("Number of return sentences", 0, 100)
 
-    st.sidebar.text('')
     st.sidebar.text('')
     st.sidebar.text('')
 
@@ -38,14 +37,6 @@ def main():
     st.sidebar.markdown('8. weather.uv(day.p=\*,ti_range.p=\*)')
     st.sidebar.markdown('9. weather.uv(day.p=\*,location=\*)')
     st.sidebar.markdown('10. weather.windchill(location=*)')
-    st.sidebar.text('')
-    st.sidebar.text('')
-    st.sidebar.text('')
-    st.sidebar.text('')
-    st.sidebar.text('')
-    st.sidebar.text('')
-
-    st.sidebar.markdown('충남대학교 지능소프트웨어연구실')
 
     # vocab 
     intent_label_vocab = load_vocab(os.path.join('./data', "intent.label.vocab")) 
