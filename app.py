@@ -18,7 +18,7 @@ def main():
                     } </style>""", unsafe_allow_html=True)
 
     # Select Box for the model
-    ### st.sidebar.image('./fig/logo.png', use_column_width=True)
+    st.sidebar.image('./fig/logo.png', use_column_width=True)
     model_name = st.sidebar.selectbox("Model", ("t5", "bart", "gpt2"))
     dataset = st.sidebar.selectbox("Dataset", ("Weather",""))  
     num_return_sequences = st.sidebar.slider("Number of return sentences", 0, 100)
