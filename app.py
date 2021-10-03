@@ -47,9 +47,8 @@ def main():
         st.markdown("") 
         see_image = st.beta_expander('You can click here to see the overall architecture 👉')
         with see_image:
-            st.image('./fig/overall_1.png')
-            st.image('./fig/overall_2.png')
-    st.text('')    
+            st.image('./fig/overall_1.png', width=700)
+            st.image('./fig/overall_2.png', width=700)
     
     row3_spacer1, row3_1, row3_spacer2 = st.beta_columns((.2, 7.1, .2))
     with row3_1:
