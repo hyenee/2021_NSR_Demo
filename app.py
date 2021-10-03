@@ -20,7 +20,6 @@ def main():
     # Select Box for the model
     st.sidebar.image('./fig/logo.png', width=150)
     model_name = st.sidebar.selectbox("Model", ("t5", "bart", "gpt2"))
-    #dataset = st.sidebar.selectbox("Dataset", ("Weather"))  
     num_return_sequences = st.sidebar.slider("Number of return sentences", 0, 100)
 
     st.sidebar.text('')
@@ -45,7 +44,11 @@ def main():
 
     row3_spacer1, row3_1, row3_spacer2 = st.beta_columns((.2, 7.1, .2))
     with row3_1:
-        st.markdown("")
+        st.markdown("") 
+        see_image = st.beta_expander('You can click here to see the overall architecture 👉')
+        with see_image:
+            st.image('./fig/overall_1.png', width=500)
+            st.image('./fig/overall_2.png', width=500)
         see_data = st.beta_expander('You can click here to see the slot tags and slot values lists 👉')
         with see_data:
             df = pd.DataFrame( columns = ['Slot tag', 'Slot value'])
