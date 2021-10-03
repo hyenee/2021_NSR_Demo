@@ -42,13 +42,18 @@ def main():
     slot_tag_label_vocab = load_vocab(os.path.join('./data', "slot_tag.label.vocab"))
     slot_value_label_vocab  = load_slot_value_vocab(os.path.join('./data', "slot_value.label.vocab"))
 
-    row3_spacer1, row3_1, row3_spacer2 = st.beta_columns((.2, 7.1, .2))
-    with row3_1:
+    row03_spacer1, row03_1, row03_spacer2 = st.beta_columns((.2, 7.1, .2))
+    with row03_1:
         st.markdown("") 
         see_image = st.beta_expander('You can click here to see the overall architecture 👉')
         with see_image:
             st.image('./fig/overall_1.png', width=500)
             st.image('./fig/overall_2.png', width=500)
+    st.text('')    
+    
+    row3_spacer1, row3_1, row3_spacer2 = st.beta_columns((.2, 7.1, .2))
+    with row3_1:
+        st.markdown("") 
         see_data = st.beta_expander('You can click here to see the slot tags and slot values lists 👉')
         with see_data:
             df = pd.DataFrame( columns = ['Slot tag', 'Slot value'])
