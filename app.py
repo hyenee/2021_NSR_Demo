@@ -9,7 +9,6 @@ pd.set_option('display.max_rows', None)
 
 def main():
     st.title('[Demo] 의미·구조적 유사성을 가진 한국어 문자열 생성 기술 연구')
-    st.subheader('Controllable Text Generator')
 
     # Applying styles to the buttons
     st.markdown("""<style>
@@ -18,38 +17,18 @@ def main():
                     } </style>""", unsafe_allow_html=True)
 
     # Select Box for the model
-    st.sidebar.image('./fig/logo.png', width=150)
-    model_name = st.sidebar.selectbox("Model", ("t5", "bart", "gpt2"))
+    st.sidebar.image('./fig/logo.png', width=200)
     num_return_sequences = st.sidebar.slider("Number of return sentences", 0, 100)
 
-    st.sidebar.text('')
-    st.sidebar.text('')
+    slot_seq_matching = st.sidebar.checkbox('Slot Sequence Matching')
+    ending_matching = st.sidebar.checkbox('Ending Matching')
 
-    st.sidebar.markdown('### 📃 Template')
-    st.sidebar.markdown('1. weather.general(day.p=\*,location=\*)')
-    st.sidebar.markdown('2. weather.humidity(day.p=\*,location=서울,ti_range.p=점심)')
-    st.sidebar.markdown('3. weather.humidity(day.p=\*,location=\*)')
-    st.sidebar.markdown('4. weather.rainfall(day.p=내일,location=\*)')
-    st.sidebar.markdown('5. weather.sunset(day.p=\*,location=논산)')
-    st.sidebar.markdown('6. weather.temperature(day.p=내일,location=울산)')
-    st.sidebar.markdown('7. weather.temperature(day.p=\*,location=\*,time=5시)')
-    st.sidebar.markdown('8. weather.uv(day.p=\*,ti_range.p=\*)')
-    st.sidebar.markdown('9. weather.uv(day.p=\*,location=\*)')
-    st.sidebar.markdown('10. weather.windchill(location=*)')
 
     # vocab 
     intent_label_vocab = load_vocab(os.path.join('./data', "intent.label.vocab")) 
     slot_tag_label_vocab = load_vocab(os.path.join('./data', "slot_tag.label.vocab"))
     slot_value_label_vocab  = load_slot_value_vocab(os.path.join('./data', "slot_value.label.vocab"))
 
-    row03_spacer1, row03_1, row03_spacer2 = st.beta_columns((.2, 7.1, .2))
-    with row03_1:
-        st.markdown("") 
-        see_image = st.beta_expander('You can click here to see the overall architecture 👉')
-        with see_image:
-            st.image('./fig/overall_1.PNG', width=700)
-            st.image('./fig/overall_2.PNG', width=700)
-    
     row3_spacer1, row3_1, row3_spacer2 = st.beta_columns((.2, 7.1, .2))
     with row3_1:
         st.markdown("") 
@@ -62,19 +41,71 @@ def main():
             st.table(df)
     st.text('')
 
+
+    st.markdown('### 📃 Template')
+    template = st.radio(
+        "",
+        ('0. [weather.maxtemperature(day.p=내일)][day.p,(있어?|찾아줘.)]', 
+        '1. [weather.sunrise(day.p=내일,location=전남)][day.p->location,(언제야?|알고싶네?)]',
+        '2. [weather.mintemperature(day.p=모레,location=독도)][day.p->location,(알려줄래요?)]',
+        '3. [weather.snowfall(day.p=오늘,location=대전 대덕구)][day.p->location,(말해주겠니?)]',
+        '4. [weather.windchill(day.p=*,location=*)][day.p->location,(어떨까?)]',
+        '5. [weather.rain(location=*,ti_range.p=*)][location->ti_range.p,(올까?)]', 
+        '6. [weather.sunset(day.p=*,location=*)][day.p->location,(알려줘.)]',
+        '7. [weather.dust(day.p=오늘)][day.p,(정도야?|심할까?|좋아졌어?|좋아?|알려줘)]',
+        '8. [weather.rainfall(day.p=*,location=*)][day.p->location,(오려나?|궁금하네)]',
+        '9. [weather.snow(day.p=*,ti_range.p=*)][day.p->ti_range.p,(해주시겠습니까?|알려줘.)]'
+        ))
+
+    
+    template = template[3:]
+    splitted = template.replace("[","").split(']')
+    # splitted[0] : semantic grammar, [1] : syntax grammar
+    semantic_grammar = splitted[0].replace(')','').split('(')
+    intent = semantic_grammar[0]
+    slot = semantic_grammar[1]
+    syntax_grammar = splitted[1].replace("(","").replace(")", "")
+    tag_str = syntax_grammar.split(',')[0]
+    ending = syntax_grammar.split(',')[1]
+        
+    st.text('')
+    st.text('')
+    # -- semantic control grammar input -- #
+    scg = '<p style="color:Blue; font-size: 20px;">Semantic Control Grammar</p>'
+    st.markdown(scg, unsafe_allow_html=True)
     row13_spacer1, row13_1, row13_spacer2, row13_2, row13_spacer3 = st.beta_columns((.2, 2.3, .2, 2.3, .2))
     with row13_1:
         intent_option = st.selectbox('Select a intent', intent_label_vocab)
         st.write('Selected intent : ', intent_option)
     with row13_2:
-        slot_option = st.text_area("Enter the slot tags and values", "day.p=*,location=*")
-        _slot_option = ''
+        slot_option = st.text_area("Enter the slot tags and values", slot)
+        _slot_option = slot_option
         if '*' in slot_option:
             _slot_option = slot_option.replace('*', '\*')
         st.write('slot tags and values : ', _slot_option)
 
-    semantic_control_grammar = intent_option + '(' + slot_option + ')'
-    st.info('semantic control grammar : '+ intent_option + '(' + _slot_option + ')')
+    semantic_control_grammar = '[' + intent_option + '(' + slot_option + ')' + ']'
+    # st.text(semantic_control_grammar)
+
+    # -- syntax control grammar input -- #
+    scg = '<p style="color:Blue; font-size: 20px;">Syntax Control Grammar</p>'
+    st.markdown(scg, unsafe_allow_html=True)
+    row13_spacer1, row13_1, row13_spacer2, row13_2, row13_spacer3 = st.beta_columns((.2, 2.3, .2, 2.3, .2))
+    with row13_1:
+        slot_seq_option = st.text_area('Enter the sequence of slot values', tag_str)
+        st.write('sequence of slot values : ', slot_seq_option)
+    with row13_2:
+        ending_option = st.text_area("Enter the sentence endings", ending)
+        st.write('endings : ', ending_option)
+
+    syntax_control_grammar = '[' + slot_seq_option + ',(' + ending_option + ')' + ']'
+    # st.text(syntax_control_grammar)
+
+    grammar = semantic_control_grammar + syntax_control_grammar
+    st.text('')
+    st.text(grammar)
+    st.text('')
+    
 
     # Generate button
     if st.button("Generate"):
@@ -82,16 +113,26 @@ def main():
         if not check_exceptions(num_return_sequences):
             # Calling the forward method on click of Generate
             with st.spinner('Progress your text .... '):
-                df = pd.read_csv(os.path.join('./data', model_name, "reranking_100.csv"), delimiter='\t')
-                is_exist = df['query'] == semantic_control_grammar
-                filtered = df[is_exist]
-                filtered.rename(columns = {'generated_texts' : '생성 문장'}, inplace = True)
+                df = pd.read_csv(os.path.join('./data', "result.out.csv"), delimiter='\t')
+                is_exist = df['query'] == grammar
+                is_seq_match = df['slot_seq'] == 1.0
+                is_ending_match = df['ending'] == 1.0
+
+                if slot_seq_matching:
+                    filtered = df[is_exist & is_seq_match]            
+                if ending_matching:
+                    filtered = df[is_exist & is_ending_match]    
+                if slot_seq_matching and ending_matching:
+                    filtered = df[is_exist & is_seq_match & is_ending_match]
+                else:
+                    filtered = df[is_exist]
+                filtered.rename(columns = {'text' : '생성 문장'}, inplace = True)
+                filtered.rename(columns = {'pred' : 'Intent Prediction'}, inplace = True)
                 filtered.reset_index(inplace = True) 
                 filtered = filtered[:num_return_sequences]    
 
-                html_table = filtered[['생성 문장', 'train_texts']].to_html(col_space='100px', justify='center') 
-                st.table(data=filtered[['생성 문장', 'train_texts']])
-
+                #html_table = filtered[['생성 문장', 'pred', 'slot_count']].to_html(col_space='100px', justify='center') 
+                st.table(data=filtered[['생성 문장', 'Intent Prediction']])
 
 
 def check_exceptions(num_return_sequences):
