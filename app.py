@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import os
+import os, json
 
 # set current SCRIPT file directory as a working directory
 os.chdir( os.path.dirname( os.path.abspath(__file__) ) )
@@ -92,8 +92,8 @@ def main():
     st.markdown(scg, unsafe_allow_html=True)
     row13_spacer1, row13_1, row13_spacer2, row13_2, row13_spacer3 = st.beta_columns((.2, 2.3, .2, 2.3, .2))
     with row13_1:
-        slot_seq_option = st.text_area('Enter the sequence of slot values', tag_str)
-        st.write('sequence of slot values : ', slot_seq_option)
+        slot_seq_option = st.text_area('Enter the slot order', tag_str)
+        st.write('slot order : ', slot_seq_option)
     with row13_2:
         ending_option = st.text_area("Enter the sentence endings", ending)
         st.write('endings : ', ending_option)
@@ -103,17 +103,32 @@ def main():
 
     grammar = semantic_control_grammar + syntax_control_grammar
     st.text('')
-    st.text(grammar)
+    st.text('Control Grammar : '+ grammar)
     st.text('')
     
 
-    # Generate button
-    if st.button("Generate"):
+    grammar_idx = 0
+    data = load_json(os.path.join('./data', "gen.data.json"))
+    text_data, grammar_data= [], []
+    for item in data:
+        text_data.append( item['text'][0] )
+        grammar_data.append ( item['grammar'] )
+    
+    for idx, g in enumerate(grammar_data):
+        if g == grammar:
+            grammar_idx = idx
+    
+    df = pd.read_csv(os.path.join('./data', "result.out.csv"), delimiter='\t')
+
+    
+    # Search button
+    if st.button("Search"):
         # Checking for exceptions
         if not check_exceptions(num_return_sequences):
             # Calling the forward method on click of Generate
-            with st.spinner('Progress your text .... '):
-                df = pd.read_csv(os.path.join('./data', "result.out.csv"), delimiter='\t')
+            with st.spinner('Progress your text .... '):     
+                st.subheader('Answer : '+ text_data[grammar_idx])
+
                 is_exist = df['query'] == grammar
                 is_seq_match = df['slot_seq'] == 1.0
                 is_ending_match = df['ending'] == 1.0
@@ -169,6 +184,11 @@ def load_slot_value_vocab(fn):
         value.sort()
 
     return vocab 
+
+def load_json(file_path):
+    with open(file_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+        return data
 
 if __name__ == '__main__':
     main()
